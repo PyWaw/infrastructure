@@ -1,0 +1,57 @@
+- hosts: pywaw.org
+  remote_user: root
+  vars_files:
+  - ../vars/main.yml
+  - ../vars/{{ settings }}.yml
+  - ../vars/secret.yml
+  - ../vars/secret_{{ settings }}.yml
+  - ../vars/envs.yml
+  tasks:
+  - name: install server requirements
+    apt: name={{ item }} update_cache=yes
+    with_items:
+      - nginx
+      - mercurial
+      - uwsgi
+      - python-virtualenv
+      - git
+      - libpq-dev
+      - python3.4-dev
+      - gcc
+  - name: add authorized keys for root user
+    authorized_key: user=root key="{{ lookup('file', item) }}"
+    with_fileglob:
+      - ../artefacts/authorized_keys/*
+  - name: create app user
+    user: name=app shell=/bin/bash
+  - name: add authorized keys for app user
+    authorized_key: user=app key="{{ lookup('file', item) }}"
+    with_fileglob:
+      - ../artefacts/authorized_keys/*
+  - name: configure nginx site
+    action: template src=../templates/nginx_site.j2 dest=/etc/nginx/sites-available/{{ settings }}
+    notify:
+    - restart nginx
+  - name: enable nginx site
+    action: file src=/etc/nginx/sites-available/{{ settings }} path=/etc/nginx/sites-enabled/{{ settings }} state=link
+    notify:
+    - restart nginx
+  - name: configure uwsgi
+    template: src=../templates/uwsgi.j2 dest=/etc/uwsgi/apps-available/{{ settings }}.yaml
+    notify:
+    - restart uwsgi
+  - name: enable uwsgi configuration
+    file: src=/etc/uwsgi/apps-available/{{ settings }}.yaml path=/etc/uwsgi/apps-enabled/{{ settings }}.yaml state=link
+    notify:
+    - restart uwsgi
+  - name: create project structure
+    file: path={{ app_path }} state=directory
+    remote_user: app
+  - name: create project virtualenv
+    command: virtualenv -p {{ python }} {{ virtualenv_path }} creates={{ virtualenv_path }}
+    remote_user: app
+  handlers:
+  - name: restart nginx
+    service: name=nginx state=restarted
+  - name: restart uwsgi
+    service: name=uwsgi state=restarted arguments={{ settings }}

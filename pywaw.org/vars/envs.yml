@@ -1,0 +1,4 @@
+django_env:
+  DJANGO_SETTINGS_MODULE: "{{ project }}.settings.{{ settings }}"
+  SECRET_KEY: "{{ secret_key }}"
+  DATABASE_URL: "postgresql://{{ db_user }}:{{ db_password }}@{{ db_address }}/{{ db_name }}"

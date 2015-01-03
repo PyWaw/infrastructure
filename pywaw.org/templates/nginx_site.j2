@@ -1,0 +1,13 @@
+upstream {{ settings }} {
+    server unix:///tmp/{{ settings }}.socket;
+}
+
+server {
+    listen 80;
+    server_name {{ domain }};
+
+    location / {
+        uwsgi_pass  {{ settings }};
+        include     uwsgi_params;
+    }
+}

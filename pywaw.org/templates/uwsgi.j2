@@ -1,0 +1,15 @@
+uwsgi:
+    uid: app
+    chmod-socket: 666
+    socket: /tmp/{{ settings }}.socket
+    module: api.wsgi
+    master: true
+    processes: 2
+    reload-on-rss: 200
+    home: /home/app/apps/{{ settings }}/venv
+    callable: application
+    chdir: /home/app/apps/{{ settings }}/repo
+    touch-reload: /tmp/{{ settings }}.reload
+    {% for name, value in django_env.items() %}
+env: {{ name }}={{ value }}
+    {% endfor %}

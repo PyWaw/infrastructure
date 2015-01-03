@@ -1,0 +1,30 @@
+- hosts: pywaw.org
+  remote_user: app
+  vars_files:
+  - ../vars/main.yml
+  - ../vars/{{ settings }}.yml
+  - ../vars/secret.yml
+  - ../vars/secret_{{ settings }}.yml
+  - ../vars/envs.yml
+  tasks:
+  - name: fetch and udpate repository
+    hg: repo={{ repository }} dest={{ repository_path }} revision={{ branch }}
+    notify:
+    - restart uwsgi
+  - name: install application requirements
+    pip: requirements={{ repository_path }}/requirements/{{ settings }}.txt virtualenv={{ virtualenv_path }}
+    notify:
+    - restart uwsgi
+  - name: syncdb
+    django_manage: command=syncdb app_path={{ repository_path }}/pywaw settings={{ django_settings }} virtualenv={{ virtualenv_path }}
+    environment: django_env
+  - name: migrate
+    django_manage: command=migrate app_path={{ repository_path }}/pywaw settings={{ django_settings }} virtualenv={{ virtualenv_path }}
+    environment: django_env
+  - name: collectstatic
+    django_manage: command=collectstatic app_path={{ repository_path }}/pywaw settings={{ django_settings }} virtualenv={{ virtualenv_path }}
+    environment: django_env
+  handlers:
+  - name: restart uwsgi
+    service: name=uwsgi state=restarted arguments={{ settings }}
+    remote_user: root

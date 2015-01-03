@@ -1,0 +1,10 @@
+project: pywaw
+python: python3.4
+repository: "https://bitbucket.org/pywaw/pywaw.org"
+db_user: "{{ project }}"
+db_name: "{{ project }}_{{ settings }}"
+db_address: "127.0.0.1:5432"
+django_settings: "{{ project }}.settings.{{ settings }}"
+app_path: "/home/app/apps/{{ settings }}"
+virtualenv_path: "{{ app_path }}/venv"
+repository_path: "{{ app_path }}/repo"
