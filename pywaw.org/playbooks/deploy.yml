@@ -8,7 +8,7 @@
   - ../vars/envs.yml
   tasks:
   - name: fetch and udpate repository
-    hg: repo={{ repository }} dest={{ repository_path }} revision={{ branch }}
+    git: repo={{ repository }} dest={{ repository_path }} version={{ branch }}
     notify:
     - restart uwsgi
   - name: install application requirements
@@ -26,5 +26,5 @@
     environment: django_env
   handlers:
   - name: restart uwsgi
-    service: name=uwsgi state=restarted arguments={{ settings }}
+    service: name=uwsgi state=restarted arguments={{ project }}_{{ settings }}
     remote_user: root

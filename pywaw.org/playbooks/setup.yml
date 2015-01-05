@@ -11,13 +11,15 @@
     apt: name={{ item }} update_cache=yes
     with_items:
       - nginx
-      - mercurial
       - uwsgi
+      - uwsgi-plugin-python3
       - python-virtualenv
       - git
       - libpq-dev
       - python3.4-dev
       - gcc
+      - postgresql-9.4
+      - python-psycopg2
   - name: add authorized keys for root user
     authorized_key: user=root key="{{ lookup('file', item) }}"
     with_fileglob:
@@ -29,19 +31,19 @@
     with_fileglob:
       - ../artefacts/authorized_keys/*
   - name: configure nginx site
-    action: template src=../templates/nginx_site.j2 dest=/etc/nginx/sites-available/{{ settings }}
+    action: template src=../templates/nginx_site.j2 dest=/etc/nginx/sites-available/{{ project }}_{{ settings }}
     notify:
     - restart nginx
   - name: enable nginx site
-    action: file src=/etc/nginx/sites-available/{{ settings }} path=/etc/nginx/sites-enabled/{{ settings }} state=link
+    action: file src=/etc/nginx/sites-available/{{ project }}_{{ settings }} path=/etc/nginx/sites-enabled/{{ project }}_{{ settings }} state=link
     notify:
     - restart nginx
   - name: configure uwsgi
-    template: src=../templates/uwsgi.j2 dest=/etc/uwsgi/apps-available/{{ settings }}.yaml
+    template: src=../templates/uwsgi.j2 dest=/etc/uwsgi/apps-available/{{ project }}_{{ settings }}.yaml
     notify:
     - restart uwsgi
   - name: enable uwsgi configuration
-    file: src=/etc/uwsgi/apps-available/{{ settings }}.yaml path=/etc/uwsgi/apps-enabled/{{ settings }}.yaml state=link
+    file: src=/etc/uwsgi/apps-available/{{ project }}_{{ settings }}.yaml path=/etc/uwsgi/apps-enabled/{{ project }}_{{ settings }}.yaml state=link
     notify:
     - restart uwsgi
   - name: create project structure
@@ -50,8 +52,22 @@
   - name: create project virtualenv
     command: virtualenv -p {{ python }} {{ virtualenv_path }} creates={{ virtualenv_path }}
     remote_user: app
+  - name: create database
+    action: postgresql_db db={{ db_name }}
+    sudo: yes
+    sudo_user: postgres
+  - name: create database user
+    action: postgresql_user db={{ db_name }} user={{ db_user }} password={{ db_password }} priv=ALL
+    sudo: yes
+    sudo_user: postgres
+  - name: setup postgresql hba
+    template: src=../templates/pg_hba.j2 dest=/etc/postgresql/9.4/main/pg_hba.conf
+    notify:
+      - restart postgresql
   handlers:
   - name: restart nginx
     service: name=nginx state=restarted
   - name: restart uwsgi
     service: name=uwsgi state=restarted arguments={{ settings }}
+  - name: restart postgresql
+    service: name=postgresql state=restarted

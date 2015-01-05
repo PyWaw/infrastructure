@@ -10,4 +10,12 @@ server {
         uwsgi_pass  {{ settings }};
         include     uwsgi_params;
     }
+
+    location /static/ {
+        alias {{ app_path }}/static/;
+    }
+
+    location /media/ {
+        alias {{ app_path }}/media/;
+    }
 }
