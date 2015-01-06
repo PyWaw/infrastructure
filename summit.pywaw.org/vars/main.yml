@@ -1,0 +1,7 @@
+project: pywaw_summit
+repository: "https://github.com/pywaw/summit.pywaw.org.git"
+settings: production
+branch: master
+app_path: "/home/app/apps/{{ project }}_{{ settings }}"
+repository_path: "{{ app_path }}/repo"
+domain: summit.pywaw.org

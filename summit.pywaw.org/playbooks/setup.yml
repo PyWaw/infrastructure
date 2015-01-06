@@ -1,0 +1,34 @@
+- hosts: pywaw.org
+  remote_user: root
+  vars_files:
+  - ../vars/main.yml
+  tasks:
+  - name: install server requirements
+    apt: name={{ item }} update_cache=yes
+    with_items:
+      - nginx
+      - git
+  - name: add authorized keys for root user
+    authorized_key: user=root key="{{ lookup('file', item) }}"
+    with_fileglob:
+      - ../artefacts/authorized_keys/*
+  - name: create app user
+    user: name=app shell=/bin/bash
+  - name: add authorized keys for app user
+    authorized_key: user=app key="{{ lookup('file', item) }}"
+    with_fileglob:
+      - ../artefacts/authorized_keys/*
+  - name: configure nginx site
+    action: template src=../templates/nginx_site.j2 dest=/etc/nginx/sites-available/{{ project }}_{{ settings }}
+    notify:
+    - restart nginx
+  - name: enable nginx site
+    action: file src=/etc/nginx/sites-available/{{ project }}_{{ settings }} path=/etc/nginx/sites-enabled/{{ project }}_{{ settings }} state=link
+    notify:
+    - restart nginx
+  - name: create project structure
+    file: path={{ app_path }} state=directory
+    remote_user: app
+  handlers:
+  - name: restart nginx
+    service: name=nginx state=restarted

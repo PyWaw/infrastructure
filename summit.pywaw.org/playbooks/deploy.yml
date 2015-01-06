@@ -1,0 +1,7 @@
+- hosts: pywaw.org
+  remote_user: app
+  vars_files:
+  - ../vars/main.yml
+  tasks:
+  - name: fetch and udpate repository
+    git: repo={{ repository }} dest={{ repository_path }} version={{ branch }}
