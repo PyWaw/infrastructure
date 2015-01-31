@@ -4,3 +4,8 @@ django_env:
   DB_NAME: "{{ db_name }}"
   DB_USER: "{{ db_user }}"
   DB_PASSWORD: "{{ db_password }}"
+  EMAIL_HOST: "{{ email_host }}"
+  EMAIL_PORT: "{{ email_port }}"
+  EMAIL_USE_TLS: "{{ email_use_tls }}"
+  EMAIL_HOST_USER: "{{ email_host_user }}"
+  EMAIL_HOST_PASSWORD: "{{ email_host_password }}"

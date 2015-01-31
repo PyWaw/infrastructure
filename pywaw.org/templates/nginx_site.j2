@@ -4,7 +4,7 @@ upstream {{ settings }} {
 
 server {
     listen 80;
-    server_name {{ domain }};
+    server_name {% if settings == 'production' %}_ {% endif %}{{ domain }};
 
     location / {
         uwsgi_pass  {{ settings }};
