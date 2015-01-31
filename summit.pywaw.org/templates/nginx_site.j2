@@ -3,6 +3,6 @@ server {
     server_name {{ domain }};
 
     location / {
-        alias {{ repository_path }};
+        alias {{ repository_path }}/;
     }
 }
