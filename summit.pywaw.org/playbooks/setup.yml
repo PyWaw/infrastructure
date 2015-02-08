@@ -2,12 +2,22 @@
   remote_user: root
   vars_files:
   - ../vars/main.yml
+  - ../vars/{{ settings }}.yml
+  - ../vars/secret.yml
+  - ../vars/secret_{{ settings }}.yml
+  - ../vars/envs.yml
   tasks:
   - name: install server requirements
     apt: name={{ item }} update_cache=yes
     with_items:
       - nginx
+      - uwsgi
+      - uwsgi-plugin-python3
+      - python-virtualenv
       - git
+      - libpq-dev
+      - python3.4-dev
+      - gcc
   - name: add authorized keys for root user
     authorized_key: user=root key="{{ lookup('file', item) }}"
     with_fileglob:
@@ -26,9 +36,22 @@
     action: file src=/etc/nginx/sites-available/{{ project }}_{{ settings }} path=/etc/nginx/sites-enabled/{{ project }}_{{ settings }} state=link
     notify:
     - restart nginx
+  - name: configure uwsgi
+    template: src=../templates/uwsgi.j2 dest=/etc/uwsgi/apps-available/{{ project }}_{{ settings }}.yaml
+    notify:
+    - restart uwsgi
+  - name: enable uwsgi configuration
+    file: src=/etc/uwsgi/apps-available/{{ project }}_{{ settings }}.yaml path=/etc/uwsgi/apps-enabled/{{ project }}_{{ settings }}.yaml state=link
+    notify:
+    - restart uwsgi
   - name: create project structure
     file: path={{ app_path }} state=directory
+    remote_user: app
+  - name: create project virtualenv
+    command: virtualenv -p {{ python }} {{ virtualenv_path }} creates={{ virtualenv_path }}
     remote_user: app
   handlers:
   - name: restart nginx
     service: name=nginx state=restarted
+  - name: restart uwsgi
+    service: name=uwsgi state=restarted arguments={{ settings }}

@@ -2,6 +2,23 @@
   remote_user: app
   vars_files:
   - ../vars/main.yml
+  - ../vars/{{ settings }}.yml
+  - ../vars/secret.yml
+  - ../vars/secret_{{ settings }}.yml
+  - ../vars/envs.yml
   tasks:
   - name: fetch and udpate repository
     git: repo={{ repository }} dest={{ repository_path }} version={{ branch }}
+    notify:
+    - restart uwsgi
+  - name: install application requirements
+    pip: requirements={{ repository_path }}/requirements/{{ settings }}.txt virtualenv={{ virtualenv_path }}
+    notify:
+    - restart uwsgi
+  - name: collectstatic
+    django_manage: command=collectstatic app_path={{ repository_path }}/{{ project }} settings={{ django_settings }} virtualenv={{ virtualenv_path }}
+    environment: django_env
+  handlers:
+  - name: restart uwsgi
+    service: name=uwsgi state=restarted arguments={{ project }}_{{ settings }}
+    remote_user: root
