@@ -15,6 +15,10 @@
     pip: requirements={{ repository_path }}/requirements/{{ settings }}.txt virtualenv={{ virtualenv_path }}
     notify:
     - restart uwsgi
+  - name: install node requirements
+    npm: path={{ repository_path }}/{{ project }}/static/
+  - name: install bower requirements
+    command: ./node_modules/.bin/bower install chdir={{ repository_path }}/{{ project }}/static/
   - name: collectstatic
     django_manage: command=collectstatic app_path={{ repository_path }}/{{ project }} settings={{ django_settings }} virtualenv={{ virtualenv_path }}
     environment: django_env

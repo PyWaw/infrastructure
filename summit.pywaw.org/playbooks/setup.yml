@@ -18,6 +18,8 @@
       - libpq-dev
       - python3.4-dev
       - gcc
+      - nodejs
+      - npm
   - name: add authorized keys for root user
     authorized_key: user=root key="{{ lookup('file', item) }}"
     with_fileglob:
@@ -50,6 +52,8 @@
   - name: create project virtualenv
     command: virtualenv -p {{ python }} {{ virtualenv_path }} creates={{ virtualenv_path }}
     remote_user: app
+  - name: create node bin link
+    file: state=link src=/usr/bin/nodejs path=/usr/bin/node
   handlers:
   - name: restart nginx
     service: name=nginx state=restarted
