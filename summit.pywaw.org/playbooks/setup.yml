@@ -20,6 +20,8 @@
       - gcc
       - nodejs
       - npm
+      - postgresql-9.4
+      - python-psycopg2
   - name: add authorized keys for root user
     authorized_key: user=root key="{{ lookup('file', item) }}"
     with_fileglob:
@@ -54,6 +56,18 @@
     remote_user: app
   - name: create node bin link
     file: state=link src=/usr/bin/nodejs path=/usr/bin/node
+  - name: create database
+    action: postgresql_db db={{ db_name }}
+    sudo: yes
+    sudo_user: postgres
+  - name: create database user
+    action: postgresql_user db={{ db_name }} user={{ db_user }} password={{ db_password }} priv=ALL
+    sudo: yes
+    sudo_user: postgres
+  - name: setup postgresql hba
+    template: src=../templates/pg_hba.j2 dest=/etc/postgresql/9.4/main/pg_hba.conf
+    notify:
+      - restart postgresql
   handlers:
   - name: restart nginx
     service: name=nginx state=restarted
