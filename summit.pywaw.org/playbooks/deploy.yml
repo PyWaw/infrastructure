@@ -16,7 +16,7 @@
     notify:
     - restart uwsgi
   - name: migrate
-    django_manage: command=migrate app_path={{ repository_path }}/pywaw settings={{ django_settings }} virtualenv={{ virtualenv_path }}
+    django_manage: command=migrate app_path={{ repository_path }}/{{ project }} settings={{ django_settings }} virtualenv={{ virtualenv_path }}
     environment: django_env
   - name: install node requirements
     npm: path={{ repository_path }}/{{ project }}/static/
