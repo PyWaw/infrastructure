@@ -6,3 +6,7 @@ django_env:
   DB_PASSWORD: "{{ db_password }}"
   MANDRILL_API_KEY: "{{ mandrill_api_key }}"
   REGISTRATION_NOTIFICATIONS_URL: "{{ registration_notifications_url }}"
+  TWITTER_CONSUMER_KEY: "{{ twitter_consumer_key }}"
+  TWITTER_CONSUMER_SECRET: "{{ twitter_consumer_secret }}"
+  TWITTER_ACCESS_TOKEN: "{{ twitter_access_token }}"
+  TWITTER_ACCESS_TOKEN_SECRET: "{{ twitter_access_token_secret }}"
