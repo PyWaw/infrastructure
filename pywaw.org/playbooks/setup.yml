@@ -7,6 +7,8 @@
   - ../vars/secret_{{ settings }}.yml
   - ../vars/envs.yml
   tasks:
+  - name: add repository with newest Python version
+    apt_repository: repo='deb http://ppa.launchpad.net/fkrull/deadsnakes/ubuntu trusty main' state=present
   - name: install server requirements
     apt: name={{ item }} update_cache=yes
     with_items:
