@@ -1,5 +1,5 @@
 project: pywaw
-python: python3.4
+python: python3.5
 repository: "https://github.com/pywaw/pywaw.org.git"
 db_user: "{{ project }}"
 db_name: "{{ project }}_{{ settings }}"
