@@ -72,7 +72,8 @@
   - name: restart nginx
     service: name=nginx state=restarted
   - name: restart uwsgi
-    service: name=uwsgi state=restarted arguments={{ settings }}
+    file: path=/tmp/{{ settings }}.reload state=touch
+    remote_user: root
   - name: restart postgresql
     service: name=postgresql state=restarted
   - name: restart supervisor
