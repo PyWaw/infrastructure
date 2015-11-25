@@ -7,3 +7,4 @@ virtualenv_path: "{{ app_path }}/venv"
 repository_path: "{{ app_path }}/repo"
 db_user: "{{ project }}"
 db_name: "{{ project }}_{{ settings }}"
+year: 2015

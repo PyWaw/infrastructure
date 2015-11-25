@@ -1,0 +1,4 @@
+[program:{{ project }}_{{ settings }}]
+command={{ virtualenv_path }}/bin/uwsgi --yaml /etc/uwsgi/apps-supervisord/{{ project }}_{{ settings }}.yaml
+autorestart=true
+stopsignal=QUIT

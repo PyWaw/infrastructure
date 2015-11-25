@@ -16,14 +16,14 @@
     notify:
     - restart uwsgi
   - name: migrate
-    django_manage: command=migrate app_path={{ repository_path }}/{{ project }} settings={{ django_settings }} virtualenv={{ virtualenv_path }}
+    django_manage: command=migrate app_path={{ repository_path }}/{{ django_project }} settings={{ django_settings }} virtualenv={{ virtualenv_path }}
     environment: django_env
   - name: install node requirements
-    npm: path={{ repository_path }}/{{ project }}/static/
+    npm: path={{ repository_path }}/{{ django_project }}/static/
   - name: install bower requirements
-    command: ./node_modules/.bin/bower install chdir={{ repository_path }}/{{ project }}/static/
+    command: ./node_modules/.bin/bower install chdir={{ repository_path }}/{{ django_project }}/static/
   - name: collectstatic
-    django_manage: command=collectstatic app_path={{ repository_path }}/{{ project }} settings={{ django_settings }} virtualenv={{ virtualenv_path }}
+    django_manage: command=collectstatic app_path={{ repository_path }}/{{ django_project }} settings={{ django_settings }} virtualenv={{ virtualenv_path }}
     environment: django_env
   handlers:
   - name: restart uwsgi

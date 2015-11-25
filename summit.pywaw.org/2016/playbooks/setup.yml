@@ -8,29 +8,29 @@
   - ../vars/envs.yml
   tasks:
   - name: install server requirements
-    apt: name={{ item }} update_cache=yes
+    apt: name={{ item }}
     with_items:
       - nginx
-      - uwsgi
-      - uwsgi-plugin-python3
       - python-virtualenv
       - git
       - libpq-dev
       - python3.5
       - python3.5-dev
       - gcc
-      - nodejs
-      - npm
       - postgresql-9.4
       - python-psycopg2
+      - supervisor
+      - gcc
+      - nodejs
+      - npm
   - name: configure uwsgi
-    template: src=../templates/uwsgi.j2 dest=/etc/uwsgi/apps-available/{{ project }}_{{ settings }}.yaml
+    template: src=../templates/uwsgi.j2 dest=/etc/uwsgi/apps-supervisord/{{ project }}_{{ settings }}.yaml
     notify:
     - restart uwsgi
-  - name: enable uwsgi configuration
-    file: src=/etc/uwsgi/apps-available/{{ project }}_{{ settings }}.yaml path=/etc/uwsgi/apps-enabled/{{ project }}_{{ settings }}.yaml state=link
+  - name: configure supervisor for uwsgi
+    action: template src=../templates/supervisord.j2 dest=/etc/supervisor/conf.d/{{ project }}_{{ settings }}.conf
     notify:
-    - restart uwsgi
+    - restart supervisor
   - name: create project structure
     file: path={{ app_path }} state=directory
     remote_user: app
@@ -50,5 +50,7 @@
   handlers:
   - name: restart nginx
     service: name=nginx state=restarted
+  - name: restart supervisor
+    service: name=supervisor state=restarted
   - name: restart uwsgi
-    service: name=uwsgi state=restarted arguments={{ settings }}
+    file: path=/tmp/{{ project }}_{{ settings }}.reload state=touch
