@@ -32,14 +32,6 @@
     authorized_key: user=app key="{{ lookup('file', item) }}"
     with_fileglob:
       - ../artefacts/authorized_keys/*
-  - name: configure nginx site
-    action: template src=../templates/nginx_site.j2 dest=/etc/nginx/sites-available/{{ project }}_{{ settings }}
-    notify:
-    - restart nginx
-  - name: enable nginx site
-    action: file src=/etc/nginx/sites-available/{{ project }}_{{ settings }} path=/etc/nginx/sites-enabled/{{ project }}_{{ settings }} state=link
-    notify:
-    - restart nginx
   - name: configure uwsgi
     template: src=../templates/uwsgi.j2 dest=/etc/uwsgi/apps-available/{{ project }}_{{ settings }}.yaml
     notify:
