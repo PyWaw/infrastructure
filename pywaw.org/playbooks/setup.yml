@@ -22,16 +22,6 @@
       - postgresql-9.4
       - python-psycopg2
       - supervisor
-  - name: add authorized keys for root user
-    authorized_key: user=root key="{{ lookup('file', item) }}"
-    with_fileglob:
-      - ../artefacts/authorized_keys/*
-  - name: create app user
-    user: name=app shell=/bin/bash
-  - name: add authorized keys for app user
-    authorized_key: user=app key="{{ lookup('file', item) }}"
-    with_fileglob:
-      - ../artefacts/authorized_keys/*
   - name: configure nginx site
     action: template src=../templates/nginx_site.j2 dest=/etc/nginx/sites-available/{{ project }}_{{ settings }}
     notify:
