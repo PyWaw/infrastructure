@@ -2,16 +2,12 @@ upstream summit_2015_{{ settings }} {
     server unix:///tmp/summit_{{ settings }}.socket;
 }
 
-upstream summit_2016_{{ settings }} {
-    server unix:///tmp/summit_2016_{{ settings }}.socket;
-}
-
 server {
     listen 80;
     server_name {{ domain }};
 
     location / {
-      return 302 /2016/;
+      return 302 /2015/;
     }
 
     location /2015/ {
@@ -25,18 +21,5 @@ server {
 
     location /2015/media/ {
         alias {{ apps_path }}/summit_{{ settings }}/media/;
-    }
-
-    location /2016/ {
-        uwsgi_pass  summit_2016_{{ settings }};
-        include     uwsgi_params;
-    }
-
-    location /2016/static/ {
-        alias {{ apps_path }}/summit_2016_{{ settings }}/static/;
-    }
-
-    location /2016/media/ {
-        alias {{ apps_path }}/summit_2016_{{ settings }}/media/;
     }
 }
