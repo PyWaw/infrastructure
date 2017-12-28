@@ -7,21 +7,11 @@
   - ../vars/secret_{{ settings }}.yml
   - ../vars/envs.yml
   tasks:
-  - name: add repository with newest Python version
-    apt_repository: repo='deb http://ppa.launchpad.net/fkrull/deadsnakes/ubuntu trusty main' state=present
   - name: install server requirements
     apt: name={{ item }} update_cache=yes
     with_items:
       - nginx
-      - python-virtualenv
       - git
-      - libpq-dev
-      - python3.5
-      - python3.5-dev
-      - gcc
-      - postgresql-9.4
-      - python-psycopg2
-      - supervisor
   - name: configure nginx site
     action: template src=../templates/nginx_site.j2 dest=/etc/nginx/sites-available/{{ project }}_{{ settings }}
     notify:
@@ -30,41 +20,9 @@
     action: file src=/etc/nginx/sites-available/{{ project }}_{{ settings }} path=/etc/nginx/sites-enabled/{{ project }}_{{ settings }} state=link
     notify:
     - restart nginx
-  - name: create uwsgi supervisord apps directory
-    file: path=/etc/uwsgi/apps-supervisord/ state=directory
-  - name: configure uwsgi
-    template: src=../templates/uwsgi.j2 dest=/etc/uwsgi/apps-supervisord/{{ project }}_{{ settings }}.yaml
-    notify:
-    - restart uwsgi
-  - name: configure supervisor for uwsgi
-    action: template src=../templates/supervisord.j2 dest=/etc/supervisor/conf.d/{{ project }}_{{ settings }}.conf
-    notify:
-    - restart supervisor
   - name: create project structure
     file: path={{ app_path }} state=directory
     remote_user: app
-  - name: create project virtualenv
-    command: virtualenv -p {{ python }} {{ virtualenv_path }} creates={{ virtualenv_path }}
-    remote_user: app
-  - name: create database
-    action: postgresql_db db={{ db_name }}
-    sudo: yes
-    sudo_user: postgres
-  - name: create database user
-    action: postgresql_user db={{ db_name }} user={{ db_user }} password={{ db_password }} priv=ALL
-    sudo: yes
-    sudo_user: postgres
-  - name: setup postgresql hba
-    template: src=../templates/pg_hba.j2 dest=/etc/postgresql/9.4/main/pg_hba.conf
-    notify:
-      - restart postgresql
   handlers:
   - name: restart nginx
     service: name=nginx state=restarted
-  - name: restart uwsgi
-    file: path=/tmp/{{ settings }}.reload state=touch
-    remote_user: root
-  - name: restart postgresql
-    service: name=postgresql state=restarted
-  - name: restart supervisor
-    service: name=supervisor state=restarted

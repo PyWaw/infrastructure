@@ -1,5 +1,5 @@
 upstream {{ settings }} {
-    server unix:///tmp/{{ settings }}.socket;
+    server localhost:8000
 }
 
 server {

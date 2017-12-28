@@ -1,2 +1,3 @@
 domain: pywaw.org
-branch: production
+branch: dockerize
+debug: false

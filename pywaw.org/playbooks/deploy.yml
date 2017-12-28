@@ -9,19 +9,10 @@
   tasks:
   - name: fetch and udpate repository
     git: repo={{ repository }} dest={{ repository_path }} version={{ branch }}
-    notify:
-    - restart uwsgi
-  - name: install application requirements
-    pip: requirements={{ repository_path }}/requirements/{{ settings }}.txt virtualenv={{ virtualenv_path }}
-    notify:
-    - restart uwsgi
-  - name: migrate
-    django_manage: command=migrate app_path={{ repository_path }}/pywaw settings={{ django_settings }} virtualenv={{ virtualenv_path }}
-    environment: django_env
-  - name: collectstatic
-    django_manage: command=collectstatic app_path={{ repository_path }}/pywaw settings={{ django_settings }} virtualenv={{ virtualenv_path }}
-    environment: django_env
-  handlers:
-  - name: restart uwsgi
-    file: path=/tmp/{{ settings }}.reload state=touch
-    remote_user: root
+  - name: start containers
+    docker_service:
+      project_name: "{{ project }}_{{ settings }}"
+      project_src: "{{ repository_path }}/containers"
+      state: present
+      build: yes
+    environment: "{{ docker_envs }}"

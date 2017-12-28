@@ -1,5 +1,5 @@
-django_env:
-  DJANGO_SETTINGS_MODULE: "{{ django_settings }}"
+docker_envs:
+  DJANGO_SETTINGS: "{{ django_settings }}"
   SECRET_KEY: "{{ secret_key }}"
   DB_NAME: "{{ db_name }}"
   DB_USER: "{{ db_user }}"
@@ -9,3 +9,7 @@ django_env:
   EMAIL_USE_TLS: "{{ email_use_tls }}"
   EMAIL_HOST_USER: "{{ email_host_user }}"
   EMAIL_HOST_PASSWORD: "{{ email_host_password }}"
+  DB_HOST: "{{ db_host }}"
+  DB_PORT: "{{ db_port }}"
+  DATA_PATH: "{{ data_path }}"
+  DEBUG: "{{ debug }}"
