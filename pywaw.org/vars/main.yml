@@ -1,11 +1,9 @@
-project: pywaw
+project: "pywaw"
 repository: "https://github.com/pywaw/pywaw.org.git"
-db_user: "postgres"
-db_name: "postgres"
-db_password: "postgres"
-db_host: db
-db_port: 5432
-django_settings: "{{ project }}.settings.{{ settings }}"
+database_url: "postgres://postgres:postgres@db/postgres"
+media_root: "/media"
+static_root: "/static"
+email_backend: "django.core.mail.backends.smtp.EmailBackend"
 app_path: "/home/app/apps/{{ project }}_{{ settings }}"
 data_path: "{{ app_path }}/data"
 repository_path: "{{ app_path }}/repo"
@@ -13,3 +11,4 @@ email_host: "smtp.gmail.com"
 email_port: "587"
 email_use_tls: "true"
 email_host_user: "info@pywaw.org"
+admin_email: "info@pywaw.org"
