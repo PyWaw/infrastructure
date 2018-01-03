@@ -1,6 +1,0 @@
-django_env:
-  DJANGO_SETTINGS_MODULE: "{{ django_settings }}"
-  SECRET_KEY: "{{ secret_key }}"
-  DB_NAME: "{{ db_name }}"
-  DB_USER: "{{ db_user }}"
-  DB_PASSWORD: "{{ db_password }}"
